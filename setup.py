@@ -8,7 +8,7 @@ setup(
     license='BSD',
     author='Heungsub Lee',
     author_email='h@subl.ee',
-    description='Library for ranking collection',
+    description='Ranking collection',
     #long_description=__doc__,
     platforms='any',
     py_modules=['ranking'],
