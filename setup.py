@@ -23,7 +23,7 @@ setup(
                  'Programming Language :: Python :: Implementation :: CPython',
                  'Programming Language :: Python :: Implementation :: PyPy',
                  'Topic :: Games/Entertainment'],
-    #test_suite='rankingtests.suite',
-    #test_loader='attest:auto_reporter.test_loader',
-    #tests_require=['Attest'],
+    test_suite='rankingtests.suite',
+    test_loader='attest:auto_reporter.test_loader',
+    tests_require=['Attest'],
 )
