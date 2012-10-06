@@ -51,10 +51,11 @@ def strategies():
 @suite.test
 def capsuled_scores():
     with raises(TypeError):
-        list(Ranking([{5}, {4}, {4}, {3}],))
+        list(Ranking([set([5]), set([4]), set([4]), set([3])],))
     def score(value):
         return list(value)[0]
-    assert Ranking([{5}, {4}, {4}, {3}], score=score).ranks() == [0, 1, 1, 3]
+    ranking = Ranking([set([5]), set([4]), set([4]), set([3])], score=score)
+    assert ranking.ranks() == [0, 1, 1, 3]
 
 
 @suite.test
