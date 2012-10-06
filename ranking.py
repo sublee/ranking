@@ -3,6 +3,8 @@
     ranking
     ~~~~~~~
 
+    :class:`Ranking` iterator and various strategies for assigning rankings.
+
     :copyright: (c) 2012 by Heungsub Lee
     :license: BSD, see LICENSE for more details.
 """
@@ -12,7 +14,7 @@ __copyright__ = 'Copyright 2012 by Heungsub Lee'
 __license__ = 'BSD License'
 __author__ = 'Heungsub Lee'
 __email__ = 'h''@''subl.ee'
-__version__ = '0.0.0'
+__version__ = '0.1'
 __all__ = ['Ranking', 'COMPETITION', 'MODIFIED_COMPETITION', 'DENSE',
            'ORDINAL', 'FRACTIONAL']
 
@@ -53,16 +55,24 @@ def FRACTIONAL(start, length):
 
 
 class Ranking(object):
+    """:class:`Ranking` assigns rank to each value.
 
-    def __init__(self, iterable=[], strategy=COMPETITION, score=None, cmp=cmp):
-        self.iterable = iterable
+    :param values: sorted score sequence
+    :param strategy: a strategy for assigning rankings. Defaults to
+                     :func:`COMPETITION`.
+    :param score: a function to get score from a value
+    :param cmp: comparation function. Defaults to :func:`cmp`.
+    """
+
+    def __init__(self, values=[], strategy=COMPETITION, score=None, cmp=cmp):
+        self.values = values
         self.strategy = strategy
         self.score = score
         self.cmp = cmp
 
     def __iter__(self):
         rank, draw = 0, []
-        for left, right in zip(self.iterable[:-1], self.iterable[1:]):
+        for left, right in zip(self.values[:-1], self.values[1:]):
             if self.score is not None:
                 left = self.score(left)
                 right = self.score(right)
@@ -82,11 +92,21 @@ class Ranking(object):
                 continue
             yield rank, left
             rank += 1
-        yield rank, right
+        try:
+            yield rank, right
+        except UnboundLocalError:
+            pass
 
     def iterranks(self):
-        for rank, item in self:
+        for rank, value in self:
             yield rank
 
     def ranks(self):
         return list(self.iterranks())
+
+    def itervalues(self):
+        for rank, value in self:
+            yield value
+
+    def values(self):
+        return list(self.itervalues())

@@ -11,7 +11,7 @@ suite = Tests()
 
 @suite.test
 def competition():
-    assert Ranking([5, 4, 4, 3]).ranks() == [0, 1, 1, 3]
+    assert Ranking([5, 4, 4, 3], COMPETITION).ranks() == [0, 1, 1, 3]
 
 
 @suite.test
@@ -38,3 +38,35 @@ def fractional():
 def unsorted():
     with raises(ValueError):
         list(Ranking([5, 4, 4, 5]))
+
+
+@suite.test
+def strategies():
+    strategies = [COMPETITION, MODIFIED_COMPETITION, DENSE, ORDINAL,
+                  FRACTIONAL]
+    for strategy in strategies:
+        assert len(list(strategy(0, 2))) == 3
+
+
+@suite.test
+def capsuled_scores():
+    with raises(TypeError):
+        list(Ranking([{5}, {4}, {4}, {3}],))
+    def score(value):
+        return list(value)[0]
+    assert Ranking([{5}, {4}, {4}, {3}], score=score).ranks() == [0, 1, 1, 3]
+
+
+@suite.test
+def less_is_more():
+    with raises(ValueError):
+        list(Ranking([3, 4, 4, 5]))
+    def compare(left, right):
+        return -cmp(left, right)
+    assert Ranking([3, 4, 4, 5], cmp=compare).ranks() == [0, 1, 1, 3]
+
+
+@suite.test
+def empty():
+    assert list(Ranking([])) == []
+    assert list(Ranking()) == []
