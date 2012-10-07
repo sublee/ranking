@@ -38,7 +38,7 @@ from setuptools import setup
 
 setup(
     name='ranking',
-    version='0.1',
+    version='0.1.1',
     license='BSD',
     author='Heungsub Lee',
     author_email='h@subl.ee',

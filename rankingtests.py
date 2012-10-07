@@ -51,10 +51,10 @@ def strategies():
 @suite.test
 def capsuled_scores():
     with raises(TypeError):
-        list(Ranking([set([5]), set([4]), set([4]), set([3])],))
-    def score(value):
+        list(Ranking([set([5]), set([4]), set([4]), set([3])]))
+    def get_score(value):
         return list(value)[0]
-    ranking = Ranking([set([5]), set([4]), set([4]), set([3])], score=score)
+    ranking = Ranking([set([5]), set([4]), set([4]), set([3])], key=get_score)
     assert ranking.ranks() == [0, 1, 1, 3]
 
 
@@ -62,12 +62,17 @@ def capsuled_scores():
 def less_is_more():
     with raises(ValueError):
         list(Ranking([3, 4, 4, 5]))
-    def compare(left, right):
+    def reverse_cmp(left, right):
         return -cmp(left, right)
-    assert Ranking([3, 4, 4, 5], cmp=compare).ranks() == [0, 1, 1, 3]
+    assert Ranking([3, 4, 4, 5], cmp=reverse_cmp).ranks() == [0, 1, 1, 3]
 
 
 @suite.test
 def empty():
     assert list(Ranking([])) == []
     assert list(Ranking()) == []
+
+
+@suite.test
+def start_from_not_zero():
+    assert Ranking([5, 4, 4, 3], start=10).ranks() == [10, 11, 11, 13]
