@@ -82,45 +82,49 @@ class Ranking(object):
     :param strategy: a strategy for assigning rankings. Defaults to
                      :func:`COMPETITION`.
     :param start: a first rank. Defaults to 0.
-    :param score: a function to get score from a value
     :param cmp: a comparation function. Defaults to :func:`cmp`.
+    :param key: a function to get score from a value
     """
 
-    def __init__(self, sequence=None, strategy=COMPETITION, start=0, key=None,
-                 cmp=cmp):
+    def __init__(self, sequence=None, strategy=COMPETITION, start=0, cmp=cmp,
+                 key=None):
         if sequence is None:
             self.sequence = []
         else:
             self.sequence = sequence
         self.strategy = strategy
         self.start = start
-        self.key = key
         self.cmp = cmp
+        self.key = key
 
     def __iter__(self):
-        rank, draw = self.start, []
-        for left, right in zip(self.sequence[:-1], self.sequence[1:]):
-            if self.key is not None:
-                left = self.key(left)
-                right = self.key(right)
-            compared = self.cmp(left, right)
+        rank, drawn = self.start, []
+        for value in self.sequence:
+            score = value if self.key is None else self.key(value)
+            try:
+                compared = self.cmp(higher_score, score)
+            except UnboundLocalError:
+                continue
+            finally:
+                higher_value = value
+                higher_score = score
             if compared < 0: # left is less than right
                 raise ValueError('Not sorted by score')
             elif compared == 0: # same scores
-                draw.append((rank, left))
+                drawn.append((rank, higher_value))
                 continue
-            elif draw: # left is more than right but there're saved draw scores
-                draw.append((rank, left))
-                for adopted_rank in self.strategy(draw[0][0], len(draw)):
+            elif drawn: # left is more than right but there're saved draw scores
+                drawn.append((rank, higher_value))
+                for adopted_rank in self.strategy(drawn[0][0], len(drawn)):
                     try:
-                        yield adopted_rank, draw.pop(0)[1]
+                        yield adopted_rank, drawn.pop(0)[1]
                     except IndexError:
                         rank = adopted_rank
                 continue
-            yield rank, left
+            yield rank, value
             rank += 1
         try:
-            yield rank, right
+            yield rank, value
         except UnboundLocalError:
             pass
 
