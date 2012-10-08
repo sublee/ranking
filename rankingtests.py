@@ -85,6 +85,6 @@ def start_from_not_zero():
 
 
 @suite.test
-def score_generator():
+def iterator_aware():
     scores = xrange(100, 50, -10)
     assert Ranking(scores).ranks() == [0, 1, 2, 3, 4]
