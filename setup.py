@@ -35,13 +35,16 @@ Links
 """
 from setuptools import setup
 
+import ranking
+
 
 setup(
-    name='ranking',
-    version='0.1.1',
-    license='BSD',
-    author='Heungsub Lee',
-    author_email='h@subl.ee',
+    name=ranking.__name__,
+    version=ranking.__version__,
+    license=ranking.__license__,
+    author=ranking.__author__,
+    author_email=ranking.__author_email__,
+    url=ranking.__url__,
     description='Ranking collection',
     long_description=__doc__,
     platforms='any',

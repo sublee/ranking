@@ -60,7 +60,9 @@ def capsuled_scores():
     users = [User(100), User(80), User(80), User(79)]
     with raises(TypeError):
         list(Ranking(users))
-    assert Ranking(users, key=lambda user: user.score).ranks() == [0, 1, 1, 3]
+    ranking = Ranking(users, key=lambda user: user.score)
+    assert ranking.ranks() == [0, 1, 1, 3]
+    assert isinstance(ranking.values()[0], User)
 
 
 @suite.test
@@ -88,3 +90,17 @@ def start_from_not_zero():
 def iterator_aware():
     scores = xrange(100, 50, -10)
     assert Ranking(scores).ranks() == [0, 1, 2, 3, 4]
+
+
+@suite.test
+def no_score_no_rank():
+    assert Ranking([100, 50, 50, None, None]).ranks() == [0, 1, 1, None, None]
+    assert Ranking([None]).ranks() == [None]
+    assert Ranking([None, None]).ranks() == [None, None]
+    assert Ranking([3, 1, 1, None]).ranks() == [0, 1, 1, None]
+
+
+@suite.test
+def multiple_ties():
+    assert Ranking([5, 5, 5, 3, 3, 3, 2, 2, 1, 1, 1, 1]).ranks() == \
+           [0, 0, 0, 3, 3, 3, 6, 6, 8, 8, 8, 8]

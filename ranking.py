@@ -8,13 +8,15 @@
     :copyright: (c) 2012 by Heungsub Lee
     :license: BSD, see LICENSE for more details.
 """
+import itertools
 
 
 __copyright__ = 'Copyright 2012 by Heungsub Lee'
-__license__ = 'BSD License'
+__version__ = '0.1.2'
+__license__ = 'BSD'
 __author__ = 'Heungsub Lee'
-__email__ = 'h''@''subl.ee'
-__version__ = '0.1.1'
+__author_email__ = 'h''@''subl.ee'
+__url__ = 'http://packages.python.org/ranking'
 __all__ = ['Ranking', 'COMPETITION', 'MODIFIED_COMPETITION', 'DENSE',
            'ORDINAL', 'FRACTIONAL']
 
@@ -42,8 +44,7 @@ def DENSE(start, length):
 
 def ORDINAL(start, length):
     """Ordinal ranking ("1234" ranking)"""
-    for x in xrange(length + 1):
-        yield start + x
+    return xrange(start, start + length + 1)
 
 
 def FRACTIONAL(start, length):
@@ -98,35 +99,40 @@ class Ranking(object):
         self.key = key
 
     def __iter__(self):
-        rank, drawn = self.start, []
-        for value in self.sequence:
-            score = value if self.key is None else self.key(value)
-            try:
-                compared = self.cmp(higher_score, score)
-            except UnboundLocalError:
+        rank, drawn, tie_started, final = self.start, [], None, object()
+        iterator = iter(self.sequence)
+        right = iterator.next()
+        right_score = right if self.key is None else self.key(right)
+        for value in itertools.chain(iterator, [final]):
+            left, right = right, value
+            left_score = right_score
+            if value is not final:
+                right_score = right if self.key is None else self.key(right)
+            if left_score is None:
+                yield None, left
                 continue
-            finally:
-                higher_value = value
-                higher_score = score
+            elif value is final:
+                compared = 1
+            else:
+                compared = self.cmp(left_score, right_score)
             if compared < 0: # left is less than right
                 raise ValueError('Not sorted by score')
             elif compared == 0: # same scores
-                drawn.append((rank, higher_value))
+                if tie_started is None:
+                    tie_started = rank
+                drawn.append(left)
                 continue
-            elif drawn: # left is more than right but there're saved draw scores
-                drawn.append((rank, higher_value))
-                for adopted_rank in self.strategy(drawn[0][0], len(drawn)):
+            elif drawn:
+                drawn.append(left)
+                for rank in self.strategy(tie_started, len(drawn)):
                     try:
-                        yield adopted_rank, drawn.pop(0)[1]
+                        yield rank, drawn.pop(0)
                     except IndexError:
-                        rank = adopted_rank
+                        pass
+                tie_started = None
                 continue
-            yield rank, value
+            yield rank, left
             rank += 1
-        try:
-            yield rank, value
-        except UnboundLocalError:
-            pass
 
     def iterranks(self):
         for rank, value in self:
