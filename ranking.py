@@ -12,7 +12,7 @@ import itertools
 
 
 __copyright__ = 'Copyright 2012 by Heungsub Lee'
-__version__ = '0.2.0'
+__version__ = '0.2'
 __license__ = 'BSD'
 __author__ = 'Heungsub Lee'
 __author_email__ = 'h''@''subl.ee'
