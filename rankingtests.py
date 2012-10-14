@@ -4,42 +4,49 @@ from collections import defaultdict
 
 from attest import Tests, assert_hook, raises
 
-from ranking import Ranking, COMPETITION, MODIFIED_COMPETITION, DENSE, \
+from ranking import ranking, COMPETITION, MODIFIED_COMPETITION, DENSE, \
                     ORDINAL, FRACTIONAL
 
 
 suite = Tests()
 
 
+def ranks(ranking):
+    ranks = []
+    for rank, score in ranking:
+        ranks.append(rank)
+    return ranks
+
+
 @suite.test
 def competition():
-    assert Ranking([5, 4, 4, 3], COMPETITION).ranks() == [0, 1, 1, 3]
+    assert ranks(ranking([5, 4, 4, 3], COMPETITION)) == [0, 1, 1, 3]
 
 
 @suite.test
 def modified_competition():
-    assert Ranking([5, 4, 4, 3], MODIFIED_COMPETITION).ranks() == [0, 2, 2, 3]
+    assert ranks(ranking([5, 4, 4, 3], MODIFIED_COMPETITION)) == [0, 2, 2, 3]
 
 
 @suite.test
 def dense():
-    assert Ranking([5, 4, 4, 3], DENSE).ranks() == [0, 1, 1, 2]
+    assert ranks(ranking([5, 4, 4, 3], DENSE)) == [0, 1, 1, 2]
 
 
 @suite.test
 def ordinal():
-    assert Ranking([5, 4, 4, 3], ORDINAL).ranks() == [0, 1, 2, 3]
+    assert ranks(ranking([5, 4, 4, 3], ORDINAL)) == [0, 1, 2, 3]
 
 
 @suite.test
 def fractional():
-    assert Ranking([5, 4, 4, 3], FRACTIONAL).ranks() == [0, 1.5, 1.5, 3]
+    assert ranks(ranking([5, 4, 4, 3], FRACTIONAL)) == [0, 1.5, 1.5, 3]
 
 
 @suite.test
 def unsorted():
     with raises(ValueError):
-        list(Ranking([5, 4, 4, 5]))
+        list(ranking([5, 4, 4, 5]))
 
 
 @suite.test
@@ -59,48 +66,49 @@ def capsuled_scores():
             raise NotImplemented
     users = [User(100), User(80), User(80), User(79)]
     with raises(TypeError):
-        list(Ranking(users))
-    ranking = Ranking(users, key=lambda user: user.score)
-    assert ranking.ranks() == [0, 1, 1, 3]
-    assert isinstance(ranking.values()[0], User)
+        list(ranking(users))
+    key = lambda user: user.score
+    assert ranks(ranking(users, key=key)) == [0, 1, 1, 3]
+    assert isinstance(ranking(users, key=key).next()[1], User)
 
 
 @suite.test
 def less_is_more():
     records = [1, 121, 121, 432]
     with raises(ValueError):
-        list(Ranking(records))
+        list(ranking(records))
     def reverse_cmp(left, right):
         return -cmp(left, right)
-    assert Ranking(records, cmp=reverse_cmp).ranks() == [0, 1, 1, 3]
+    assert ranks(ranking(records, cmp=reverse_cmp)) == [0, 1, 1, 3]
 
 
 @suite.test
 def empty():
-    assert list(Ranking([])) == []
-    assert list(Ranking()) == []
+    assert list(ranking([])) == []
+    with raises(TypeError):
+        ranking()
 
 
 @suite.test
 def start_from_not_zero():
-    assert Ranking([5, 4, 4, 3], start=10).ranks() == [10, 11, 11, 13]
+    assert ranks(ranking([5, 4, 4, 3], start=10)) == [10, 11, 11, 13]
 
 
 @suite.test
 def iterator_aware():
     scores = xrange(100, 50, -10)
-    assert Ranking(scores).ranks() == [0, 1, 2, 3, 4]
+    assert ranks(ranking(scores)) == [0, 1, 2, 3, 4]
 
 
 @suite.test
 def no_score_no_rank():
-    assert Ranking([100, 50, 50, None, None]).ranks() == [0, 1, 1, None, None]
-    assert Ranking([None]).ranks() == [None]
-    assert Ranking([None, None]).ranks() == [None, None]
-    assert Ranking([3, 1, 1, None]).ranks() == [0, 1, 1, None]
+    assert ranks(ranking([100, 50, 50, None, None])) == [0, 1, 1, None, None]
+    assert ranks(ranking([None])) == [None]
+    assert ranks(ranking([None, None])) == [None, None]
+    assert ranks(ranking([3, 1, 1, None])) == [0, 1, 1, None]
 
 
 @suite.test
 def multiple_ties():
-    assert Ranking([5, 5, 5, 3, 3, 3, 2, 2, 1, 1, 1, 1]).ranks() == \
+    assert ranks(ranking([5, 5, 5, 3, 3, 3, 2, 2, 1, 1, 1, 1])) == \
            [0, 0, 0, 3, 3, 3, 6, 6, 8, 8, 8, 8]
