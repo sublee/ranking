@@ -1,13 +1,43 @@
 Ranking
 =======
 
-.. module:: ranking
+strategies to assign ranks
 
-This library provides :class:`Ranking` to assign rank to each values and
-various `strategies for assigning rankings`_.
+.. currentmodule:: ranking
+
+Introduction
+~~~~~~~~~~~~
+
+In most cases, `enumerate` a Python standard function is a best tool to make a
+ranking. But how about tie scores? Someone who ties with another one but is
+assigned lower rank will feel dissatisfaction.
+
+::
+
+   >>> list(enumerate([100, 80, 80, 70]))
+   [(0, 100), (1, 80), (2, 80), (3, 70)]
+
+This module implements :class:`Ranking` that looks like `enumerate` but
+generates ranks instead of indexes and various strategy to assign ranks to tie
+scores.
+
+::
+
+   >>> list(Ranking([100, 80, 80, 70])) # same scores have same ranks
+   [(0, 100), (1, 80), (1, 80), (3, 70)]
+
+API
+~~~
 
 .. autoclass:: Ranking
    :members:
+
+Strategies to assign ranks
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:class:`Ranking` follows the strategy function when it assigns ranks to tie
+scores. Also this module provides `most common 5 strategies <http://en.
+wikipedia.org/wiki/Ranking#Strategies_for_assigning_rankings>`_:
 
 .. autofunction:: COMPETITION
 .. autofunction:: MODIFIED_COMPETITION
@@ -15,5 +45,42 @@ various `strategies for assigning rankings`_.
 .. autofunction:: ORDINAL
 .. autofunction:: FRACTIONAL
 
-.. _strategies for assigning rankings: 
-   http://en.wikipedia.org/wiki/Ranking#Strategies_for_assigning_rankings
+If you need your own strategy then you can implement a strategy function. A
+strategy function has parameters `start`, a rank of the first tie score;
+`length`; a length of tie scores. Then it returns `length` + 1 numbers for each
+scores for tie scores and the next rank.
+
+Here's an example to don't assign ranks to tie scores:
+
+::
+
+   >>> def exclusive(start, length):
+   ...     return [None] * length + [start]
+   >>> list(Ranking([100, 80, 80, 70], exclusive))
+   [(0, 100), (None, 80), (None, 80), (1, 70)]
+
+Install
+~~~~~~~
+
+The package is available in `PyPI <http://pypi.python.org/pypi/ranking>`_. To
+install it in your system, use `easy_install`:
+
+.. sourcecode:: bash
+
+   $ easy_install ranking
+
+Or check out developement version:
+
+.. sourcecode:: bash
+
+   $ git clone git://github.com/sublee/ranking.git
+
+Licensing and Author
+~~~~~~~~~~~~~~~~~~~~
+
+This project licensed with `BSD <http://en.wikipedia.org/wiki/BSD_licenses>`_.
+See `LICENSE <https://github.com/sublee/ranking/blob/master/LICENSE>`_ for the
+details.
+
+I'm `Heungsub Lee <http://subl.ee/>`_, a game developer. Any regarding
+questions or patches will be welcomed.
