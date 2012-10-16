@@ -12,7 +12,7 @@ import itertools
 
 
 __copyright__ = 'Copyright 2012 by Heungsub Lee'
-__version__ = '0.2'
+__version__ = '0.2.1'
 __license__ = 'BSD'
 __author__ = 'Heungsub Lee'
 __author_email__ = 'h''@''subl.ee'
@@ -55,54 +55,68 @@ def FRACTIONAL(start, length):
     yield start + length
 
 
-def ranking(sequence, strategy=COMPETITION, start=0, cmp=cmp, key=None):
-    """:func:`ranking` looks like :func:`enumerate` but generates a `tuple`
-    containing a rank instead of an index.
+class Ranking(object):
+    """This class looks like `enumerate` but generates a `tuple` containing a
+    rank and value instead.
 
     >>> scores = [100, 80, 80, 70, None]
-    >>> list(enumerate(scores))
-    [(0, 100), (1, 80), (2, 80), (3, 70), (4, None)]
     >>> list(ranking(scores))
     [(0, 100), (1, 80), (1, 80), (3, 70), (None, None)]
 
-    :param sequence: sorted score sequence
+    :param sequence: sorted score sequence. `None` in the sequence means that
+                     no score.
     :param strategy: a strategy for assigning rankings. Defaults to
                      :func:`COMPETITION`.
     :param start: a first rank. Defaults to 0.
     :param cmp: a comparation function. Defaults to :func:`cmp`.
     :param key: a function to get score from a value
     """
-    rank, drawn, tie_started, final = start, [], None, object()
-    iterator = iter(sequence)
-    right = iterator.next()
-    right_score = right if key is None else key(right)
-    for value in itertools.chain(iterator, [final]):
-        left, right = right, value
-        left_score = right_score
-        if value is not final:
-            right_score = right if key is None else key(right)
-        if left_score is None:
-            yield None, left
-            continue
-        elif value is final:
-            compared = 1
-        else:
-            compared = cmp(left_score, right_score)
-        if compared < 0: # left is less than right
-            raise ValueError('Not sorted by score')
-        elif compared == 0: # same scores
-            if tie_started is None:
-                tie_started = rank
-            drawn.append(left)
-            continue
-        elif drawn:
-            drawn.append(left)
-            for rank in strategy(tie_started, len(drawn)):
-                try:
-                    yield rank, drawn.pop(0)
-                except IndexError:
-                    pass
-            tie_started = None
-            continue
-        yield rank, left
-        rank += 1
+
+    def __init__(self, sequence, strategy=COMPETITION, start=0, cmp=cmp,
+                 key=None):
+        self.sequence = sequence
+        self.strategy = strategy
+        self.start = start
+        self.cmp = cmp
+        self.key = key
+
+    def __iter__(self):
+        rank, drawn, tie_started, final = self.start, [], None, object()
+        iterator = iter(self.sequence)
+        right = iterator.next()
+        right_score = right if self.key is None else self.key(right)
+        for value in itertools.chain(iterator, [final]):
+            left, right = right, value
+            left_score = right_score
+            if value is not final:
+                right_score = right if self.key is None else self.key(right)
+            if left_score is None:
+                yield None, left
+                continue
+            elif value is final:
+                compared = 1
+            else:
+                compared = self.cmp(left_score, right_score)
+            if compared < 0: # left is less than right
+                raise ValueError('Not sorted by score')
+            elif compared == 0: # same scores
+                if tie_started is None:
+                    tie_started = rank
+                drawn.append(left)
+                continue
+            elif drawn:
+                drawn.append(left)
+                for rank in self.strategy(tie_started, len(drawn)):
+                    try:
+                        yield rank, drawn.pop(0)
+                    except IndexError:
+                        pass
+                tie_started = None
+                continue
+            yield rank, left
+            rank += 1
+
+    def ranks(self):
+        """Generates only ranks."""
+        for rank, value in self:
+            yield rank
