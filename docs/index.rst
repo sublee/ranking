@@ -9,8 +9,9 @@ Introduction
 ~~~~~~~~~~~~
 
 In most cases, `enumerate` a Python standard function is a best tool to make a
-ranking. But how about tie scores? Someone who ties with another one but is
-assigned lower rank will feel dissatisfaction.
+ranking. But how about tie scores? You may end up with giving different rank
+for tie scores. And I'm quite sure that will make you and your users
+dissatisfied. Solution? You are on the right page.
 
 ::
 
@@ -45,12 +46,13 @@ wikipedia.org/wiki/Ranking#Strategies_for_assigning_rankings>`_:
 .. autofunction:: ORDINAL
 .. autofunction:: FRACTIONAL
 
-If you need your own strategy then you can implement a strategy function. A
-strategy function has parameters `start`, a rank of the first tie score;
-`length`; a length of tie scores. Then it returns `length` + 1 numbers for each
-scores for tie scores and the next rank.
+You can also implement your own strategy function. A strategy function has
+parameters `start`, a rank of the first tie score; `length`, a length of tie
+scores. Then it returns `length` + 1 for each scores for tie scores
+and the next rank.
 
-Here's an example to don't assign ranks to tie scores:
+Here's an example of custom strategy function that assigns no ranks to tie
+scores:
 
 ::
 
@@ -78,7 +80,7 @@ Or check out developement version:
 Licensing and Author
 ~~~~~~~~~~~~~~~~~~~~
 
-This project licensed with `BSD <http://en.wikipedia.org/wiki/BSD_licenses>`_.
+This project is licensed with `BSD <http://en.wikipedia.org/wiki/BSD_licenses>`_.
 See `LICENSE <https://github.com/sublee/ranking/blob/master/LICENSE>`_ for the
 details.
 
