@@ -80,9 +80,11 @@ Or check out developement version:
 Licensing and Author
 ~~~~~~~~~~~~~~~~~~~~
 
-This project is licensed with `BSD <http://en.wikipedia.org/wiki/BSD_licenses>`_.
-See `LICENSE <https://github.com/sublee/ranking/blob/master/LICENSE>`_ for the
-details.
+This project is licensed under BSD_. See LICENSE_ for the details.
 
-I'm `Heungsub Lee <http://subl.ee/>`_, a game developer. Any regarding
-questions or patches will be welcomed.
+I'm `Heungsub Lee`_, a game developer. Any regarding questions or patches are
+welcomed.
+
+.. _BSD: http://en.wikipedia.org/wiki/BSD_licenses
+.. _LICENSE: https://github.com/sublee/ranking/blob/master/LICENSE
+.. _Heungsub Lee: http://subl.ee/
