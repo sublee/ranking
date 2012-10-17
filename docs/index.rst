@@ -61,8 +61,8 @@ scores:
    >>> list(Ranking([100, 80, 80, 70], exclusive))
    [(0, 100), (None, 80), (None, 80), (1, 70)]
 
-Install
-~~~~~~~
+Installing
+~~~~~~~~~~
 
 The package is available in `PyPI <http://pypi.python.org/pypi/ranking>`_. To
 install it in your system, use `easy_install`:
