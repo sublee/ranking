@@ -1,1 +1,3 @@
 include LICENSE rankingtests.py
+prune docs/_build
+prune docs/_themes/.git
