@@ -1,3 +1,19 @@
+Version 0.2.3
+-------------
+
+Released on Oct 26th 2012.
+
+- Adds `no_score` parameter to use other value for "no score" instead of
+  `None`.
+- Implements `score_comparer`.
+
+Version 0.2.2
+-------------
+
+Released on Oct 26th 2012.
+
+- Adds `reverse` parameter for :class:`Ranking`.
+- Adds :meth:`Ranking.rank` to find the rank of the value.
 Version 0.2.2
 -------------
 

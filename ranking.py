@@ -12,13 +12,13 @@ import itertools
 
 
 __copyright__ = 'Copyright 2012 by Heungsub Lee'
-__version__ = '0.2.2'
+__version__ = '0.2.3'
 __license__ = 'BSD'
 __author__ = 'Heungsub Lee'
 __author_email__ = 'h''@''subl.ee'
 __url__ = 'http://packages.python.org/ranking'
-__all__ = ['ranking', 'COMPETITION', 'MODIFIED_COMPETITION', 'DENSE',
-           'ORDINAL', 'FRACTIONAL']
+__all__ = ['Ranking', 'score_comparer', 'COMPETITION', 'MODIFIED_COMPETITION',
+           'DENSE', 'ORDINAL', 'FRACTIONAL']
 
 
 def COMPETITION(start, length):
@@ -55,6 +55,30 @@ def FRACTIONAL(start, length):
     yield start + length
 
 
+def score_comparer(key=None, reverse=False, no_score=None):
+    """A helper function to generate a cmp function which is aware of score
+    sorting rule.
+
+        >>> my_cmp = score_comparer(no_score=-1) # -1 means "no score"
+        >>> sorted([-3, -2, -1, 0, 1, 2], my_cmp)
+        [2, 1, 0, -2, -3, -1]
+
+    .. versionadded:: 0.2.3
+    """
+    def compare(left, right):
+        left_score = left if key is None else key(left)
+        if left_score == no_score:
+            return 1
+        right_score = right if key is None else key(right)
+        if right_score == no_score:
+            return -1
+        compared = cmp(left_score, right_score)
+        if not reverse:
+            compared = -compared
+        return compared
+    return compare
+
+
 class Ranking(object):
     """This class looks like `enumerate` but generates a `tuple` containing a
     rank and value instead.
@@ -72,16 +96,18 @@ class Ranking(object):
     :param key: a function to get score from a value
     :param reverse: `sequence` is in ascending order if `True`, descending
                     otherwise. Defaults to `False`.
+    :param no_score: a value for representing "no score". Defaults to `None`.
     """
 
     def __init__(self, sequence, strategy=COMPETITION, start=0, cmp=cmp,
-                 key=None, reverse=False):
+                 key=None, reverse=False, no_score=None):
         self.sequence = sequence
         self.strategy = strategy
         self.start = start
         self.cmp = cmp
         self.key = key
         self.reverse = reverse
+        self.no_score = no_score
 
     def __iter__(self):
         rank, drawn, tie_started, final = self.start, [], None, object()
@@ -93,10 +119,10 @@ class Ranking(object):
             left_score = right_score
             if value is not final:
                 right_score = right if self.key is None else self.key(right)
-            if left_score is None:
+            if left_score == self.no_score:
                 yield None, left
                 continue
-            elif right_score is None or value is final:
+            elif right_score == self.no_score or value is final:
                 compared = 1
             else:
                 compared = self.cmp(left_score, right_score)
@@ -133,6 +159,6 @@ class Ranking(object):
         :raises ValueError: the value isn't ranked in the ranking
         """
         for rank, other in self:
-            if value is other:
+            if value == other:
                 return rank
         raise ValueError('%r is not ranked' % value)

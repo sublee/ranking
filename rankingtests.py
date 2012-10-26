@@ -4,8 +4,8 @@ from collections import defaultdict
 
 from attest import Tests, assert_hook, raises
 
-from ranking import Ranking, COMPETITION, MODIFIED_COMPETITION, DENSE, \
-                    ORDINAL, FRACTIONAL
+from ranking import Ranking, score_comparer, COMPETITION, \
+                    MODIFIED_COMPETITION, DENSE, ORDINAL, FRACTIONAL
 
 
 suite = Tests()
@@ -105,6 +105,17 @@ def no_score_no_rank():
 
 
 @suite.test
+def custom_no_score():
+    assert ranks(Ranking([100, 50, 50, -1, -1], no_score=-1)) == \
+           [0, 1, 1, None, None]
+    assert ranks(Ranking([-1], no_score=-1)) == [None]
+    assert ranks(Ranking([-1, -1], no_score=-1)) == [None, None]
+    assert ranks(Ranking([3, 1, 1, -1], no_score=-1)) == [0, 1, 1, None]
+    assert ranks(Ranking([1, 1, 3, -1], reverse=True, no_score=-1)) == \
+           [0, 0, 2, None]
+
+
+@suite.test
 def multiple_ties():
     assert ranks(Ranking([5, 5, 5, 3, 3, 3, 2, 2, 1, 1, 1, 1])) == \
            [0, 0, 0, 3, 3, 3, 6, 6, 8, 8, 8, 8]
@@ -115,3 +126,16 @@ def custom_strategy():
     def exclusive(start, length):
         return [None] * length + [start]
     assert ranks(Ranking([100, 80, 80, 70], exclusive)) == [0, None, None, 1]
+
+
+@suite.test
+def comparer_maker():
+    cmp1 = score_comparer()
+    assert sorted([1, None, 5, 2], cmp1) == [5, 2, 1, None]
+    cmp2 = score_comparer(key=lambda x: x[1])
+    assert sorted([[0, 1], [0, None], [0, 5], [0, 2]], cmp2) == \
+           [[0, 5], [0, 2], [0, 1], [0, None]]
+    cmp3 = score_comparer(reverse=True)
+    assert sorted([1, None, 5, 2], cmp3) == [1, 2, 5, None]
+    cmp4 = score_comparer(no_score=-1)
+    assert sorted([1, -1, 5, 2, -2], cmp4) == [5, 2, 1, -2, -1]
