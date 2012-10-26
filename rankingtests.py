@@ -72,12 +72,10 @@ def capsuled_scores():
 
 @suite.test
 def less_is_more():
-    records = [1, 121, 121, 432]
+    records = [1, 121, 121, 432, None, None]
     with raises(ValueError):
         list(Ranking(records))
-    def reverse_cmp(left, right):
-        return -cmp(left, right)
-    assert ranks(Ranking(records, cmp=reverse_cmp)) == [0, 1, 1, 3]
+    assert ranks(Ranking(records, reverse=True)) == [0, 1, 1, 3, None, None]
 
 
 @suite.test

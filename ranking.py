@@ -12,7 +12,7 @@ import itertools
 
 
 __copyright__ = 'Copyright 2012 by Heungsub Lee'
-__version__ = '0.2.1'
+__version__ = '0.2.2'
 __license__ = 'BSD'
 __author__ = 'Heungsub Lee'
 __author_email__ = 'h''@''subl.ee'
@@ -70,15 +70,18 @@ class Ranking(object):
     :param start: a first rank. Defaults to 0.
     :param cmp: a comparation function. Defaults to :func:`cmp`.
     :param key: a function to get score from a value
+    :param reverse: `sequence` is in ascending order if `True`, descending
+                    otherwise. Defaults to `False`.
     """
 
     def __init__(self, sequence, strategy=COMPETITION, start=0, cmp=cmp,
-                 key=None):
+                 key=None, reverse=False):
         self.sequence = sequence
         self.strategy = strategy
         self.start = start
         self.cmp = cmp
         self.key = key
+        self.reverse = reverse
 
     def __iter__(self):
         rank, drawn, tie_started, final = self.start, [], None, object()
@@ -93,12 +96,15 @@ class Ranking(object):
             if left_score is None:
                 yield None, left
                 continue
-            elif value is final:
+            elif right_score is None or value is final:
                 compared = 1
             else:
                 compared = self.cmp(left_score, right_score)
+                if self.reverse:
+                    compared = -compared
             if compared < 0: # left is less than right
-                raise ValueError('Not sorted by score')
+                raise ValueError('%r should be behind of %r' % \
+                                 (left_score, right_score))
             elif compared == 0: # same scores
                 if tie_started is None:
                     tie_started = rank
@@ -120,3 +126,13 @@ class Ranking(object):
         """Generates only ranks."""
         for rank, value in self:
             yield rank
+
+    def rank(self, value):
+        """Finds the rank of the value.
+
+        :raises ValueError: the value isn't ranked in the ranking
+        """
+        for rank, other in self:
+            if value is other:
+                return rank
+        raise ValueError('%r is not ranked' % value)

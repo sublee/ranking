@@ -31,7 +31,7 @@ API
 ~~~
 
 .. autoclass:: Ranking
-   :members:
+   :members: ranks, rank
 
 Strategies to assign ranks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -76,6 +76,11 @@ Or check out developement version:
 .. sourcecode:: bash
 
    $ git clone git://github.com/sublee/ranking.git
+
+Changelog
+~~~~~~~~~
+
+.. include:: ../CHANGES
 
 Licensing and Author
 ~~~~~~~~~~~~~~~~~~~~
