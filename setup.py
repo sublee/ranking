@@ -33,18 +33,34 @@ Links
    http://en.wikipedia.org/wiki/Ranking#Strategies_for_assigning_rankings
 
 """
+from __future__ import with_statement
+import re
 from setuptools import setup
+from setuptools.command.test import test
+import sys
 
-import ranking
+
+# detect the current version
+with open('ranking.py') as f:
+    version = re.search(r'__version__\s*=\s*\'(.+?)\'', f.read()).group(1)
+assert version
+
+
+# use pytest instead
+def run_tests(self):
+    pyc = re.compile(r'\.pyc|\$py\.class')
+    test_file = pyc.sub('.py', __import__(self.test_suite).__file__)
+    raise SystemExit(__import__('pytest').main([test_file]))
+test.run_tests = run_tests
 
 
 setup(
-    name=ranking.__name__,
-    version=ranking.__version__,
-    license=ranking.__license__,
-    author=ranking.__author__,
-    author_email=ranking.__author_email__,
-    url=ranking.__url__,
+    name='ranking',
+    version=version,
+    license='BSD',
+    author='Heungsub Lee',
+    author_email='h'r'@'r's'r'u'r'b'r'l'r'.'r'e'r'e',
+    url='http://packages.python.org/ranking',
     description='Ranking collection',
     long_description=__doc__,
     platforms='any',
@@ -54,13 +70,19 @@ setup(
                  'License :: OSI Approved :: BSD License',
                  'Operating System :: OS Independent',
                  'Programming Language :: Python',
+                 'Programming Language :: Python :: 2',
                  'Programming Language :: Python :: 2.5',
                  'Programming Language :: Python :: 2.6',
                  'Programming Language :: Python :: 2.7',
+                 'Programming Language :: Python :: 3',
+                 'Programming Language :: Python :: 3.1',
+                 'Programming Language :: Python :: 3.2',
+                 'Programming Language :: Python :: 3.3',
                  'Programming Language :: Python :: Implementation :: CPython',
+                 'Programming Language :: Python :: Implementation :: Jython',
                  'Programming Language :: Python :: Implementation :: PyPy',
                  'Topic :: Games/Entertainment'],
-    test_suite='rankingtests.suite',
-    test_loader='attest:auto_reporter.test_loader',
-    tests_require=['Attest'],
+    test_suite='rankingtests',
+    tests_require=['pytest'],
+    use_2to3=(sys.version_info[0] >= 3),
 )

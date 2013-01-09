@@ -5,20 +5,22 @@
 
     :class:`Ranking` and various strategies for assigning rankings.
 
-    :copyright: (c) 2012 by Heungsub Lee
+    :copyright: (c) 2012-2013 by Heungsub Lee
     :license: BSD, see LICENSE for more details.
 """
 import itertools
 
 
-__copyright__ = 'Copyright 2012 by Heungsub Lee'
-__version__ = '0.2.3'
-__license__ = 'BSD'
-__author__ = 'Heungsub Lee'
-__author_email__ = 'h''@''subl.ee'
-__url__ = 'http://packages.python.org/ranking'
+__version__ = '0.2.4'
 __all__ = ['Ranking', 'score_comparer', 'COMPETITION', 'MODIFIED_COMPETITION',
            'DENSE', 'ORDINAL', 'FRACTIONAL']
+
+
+try:
+    cmp
+except NameError:
+    # for Python 3
+    cmp = lambda a, b: -1 if a < b else 1 if a > b else 0
 
 
 def COMPETITION(start, length):
@@ -112,7 +114,7 @@ class Ranking(object):
     def __iter__(self):
         rank, drawn, tie_started, final = self.start, [], None, object()
         iterator = iter(self.sequence)
-        right = iterator.next()
+        right = next(iterator)
         right_score = right if self.key is None else self.key(right)
         for value in itertools.chain(iterator, [final]):
             left, right = right, value
