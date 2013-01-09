@@ -21,6 +21,11 @@ try:
 except NameError:
     # for Python 3
     cmp = lambda a, b: -1 if a < b else 1 if a > b else 0
+try:
+    next
+except NameError:
+    # for Python 2.5
+    next = lambda it: it.next()
 
 
 def COMPETITION(start, length):
