@@ -1,3 +1,15 @@
+Version 0.3
+-----------
+
+Released on Jan 30th 2013.
+
+Doesn't support old ``cmp`` style just like Python 3.
+
+- Removes``cmp`` parameter from :class:`Ranking`.
+- Removes :func:`score_comparer`.
+- ``key``, ``reverse``, ``no_score`` parameter of :class:`Ranking` is now
+  keyword-only.
+
 Version 0.2.4
 -------------
 
@@ -10,23 +22,23 @@ Version 0.2.3
 
 Released on Oct 26th 2012.
 
-- Adds `no_score` parameter to use other value for "no score" instead of
-  `None`.
-- Implements `score_comparer`.
+- Adds ``no_score`` parameter to use other value for "no score" instead of
+  ``None``.
+- Implements :func:`score_comparer`.
 
 Version 0.2.2
 -------------
 
 Released on Oct 26th 2012.
 
-- Adds `reverse` parameter for :class:`Ranking`.
+- Adds ``reverse`` parameter for :class:`Ranking`.
 - Adds :meth:`Ranking.rank` to find the rank of the value.
 Version 0.2.2
 -------------
 
 Released on Oct 26th 2012.
 
-- Adds `reverse` parameter for :class:`Ranking`.
+- Adds ``reverse`` parameter for :class:`Ranking`.
 - Adds :meth:`Ranking.rank` to find the rank of the value.
 
 Version 0.1.2
@@ -34,8 +46,9 @@ Version 0.1.2
 
 Released on Oct 9th 2012.
 
-- Uses `None` for "no score".
-- Works with `sequence` as an iterator instead of only a list or tuple object.
+- Uses ``None`` for "no score".
+- Works with ``sequence`` as an iterator instead of only a list or tuple
+  object.
 - :class:`Ranking` yields values instead of found scores.
 
 Version 0.1.1
@@ -43,8 +56,8 @@ Version 0.1.1
 
 Released on Oct 7th 2012.
 
-- Adds `start` parameter for :class:`Ranking`.
-- Renames `score` parameter for :class:`Ranking` to `key`.
+- Adds ``start`` parameter for :class:`Ranking`.
+- Renames ``score`` parameter for :class:`Ranking` to ``key``.
 
 Version 0.1
 -----------

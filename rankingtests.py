@@ -4,8 +4,8 @@ from collections import defaultdict
 
 from pytest import raises
 
-from ranking import (Ranking, score_comparer, COMPETITION,
-                     MODIFIED_COMPETITION, DENSE, ORDINAL, FRACTIONAL)
+from ranking import (Ranking, COMPETITION, MODIFIED_COMPETITION, DENSE,
+                     ORDINAL, FRACTIONAL)
 
 
 try:
@@ -55,7 +55,9 @@ def test_capsuled_scores():
     class User(object):
         def __init__(self, score):
             self.score = score
-        def __cmp__(self, other):
+        def __lt__(self, other):
+            raise NotImplemented
+        def __gt__(self, other):
             raise NotImplemented
     users = [User(100), User(80), User(80), User(79)]
     with raises(TypeError):
@@ -116,41 +118,11 @@ def test_custom_strategy():
     assert ranks(Ranking([100, 80, 80, 70], exclusive)) == [0, None, None, 1]
 
 
-def test_comparer_maker():
-    cmp1 = score_comparer()
-    cmp2 = score_comparer(key=lambda x: x[1])
-    cmp3 = score_comparer(reverse=True)
-    cmp4 = score_comparer(no_score=-1)
-    try:
-        [].sort(cmp=None)
-    except TypeError:
-        try:
-            from functools import cmp_to_key
-        except ImportError:
-            # for Python 3.1
-            def cmp_to_key(cmp):
-                class K(object):
-                    __slots__ = ['x']
-                    __hash__ = None
-                    def __init__(self, x): self.x = x
-                    def __lt__(self, y): return cmp(self.x, y.x) < 0
-                    def __gt__(self, y): return cmp(self.x, y.x) > 0
-                    def __eq__(self, y): return cmp(self.x, y.x) == 0
-                    def __le__(self, y): return cmp(self.x, y.x) <= 0
-                    def __ge__(self, y): return cmp(self.x, y.x) >= 0
-                    def __ne__(self, y): return cmp(self.x, y.x) != 0
-                return K
-        kw1 = {'key': cmp_to_key(cmp1)}
-        kw2 = {'key': cmp_to_key(cmp2)}
-        kw3 = {'key': cmp_to_key(cmp3)}
-        kw4 = {'key': cmp_to_key(cmp4)}
-    else:
-        kw1 = {'cmp': cmp1}
-        kw2 = {'cmp': cmp2}
-        kw3 = {'cmp': cmp3}
-        kw4 = {'cmp': cmp4}
-    assert sorted([1, None, 5, 2], **kw1) == [5, 2, 1, None]
-    assert sorted([[0, 1], [0, None], [0, 5], [0, 2]], **kw2) == \
-           [[0, 5], [0, 2], [0, 1], [0, None]]
-    assert sorted([1, None, 5, 2], **kw3) == [1, 2, 5, None]
-    assert sorted([1, -1, 5, 2, -2], **kw4) == [5, 2, 1, -2, -1]
+def test_keyword_only():
+    with raises(TypeError):
+        Ranking([], COMPETITION, 0, None)
+
+
+def test_no_cmp():
+    with raises(TypeError):
+        Ranking([], cmp=lambda a, b: -1)

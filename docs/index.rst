@@ -33,8 +33,6 @@ API
 .. autoclass:: Ranking
    :members: ranks, rank
 
-.. autofunction:: score_comparer
-
 Strategies to assign ranks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 

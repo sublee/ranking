@@ -11,16 +11,11 @@
 import itertools
 
 
-__version__ = '0.2.4'
-__all__ = ['Ranking', 'score_comparer', 'COMPETITION', 'MODIFIED_COMPETITION',
-           'DENSE', 'ORDINAL', 'FRACTIONAL']
+__version__ = '0.3'
+__all__ = ['Ranking', 'COMPETITION', 'MODIFIED_COMPETITION', 'DENSE',
+           'ORDINAL', 'FRACTIONAL']
 
 
-try:
-    cmp
-except NameError:
-    # for Python 3
-    cmp = lambda a, b: -1 if a < b else 1 if a > b else 0
 try:
     next
 except NameError:
@@ -28,6 +23,17 @@ except NameError:
     next = lambda it: it.next()
 
 
+def strategy(f):
+    class Strategy(object):
+        def __call__(self, start, length):
+            return f(start, length)
+        def __repr__(self):
+            return f.__name__
+    Strategy.__name__ = f.__name__
+    return Strategy()
+
+
+@strategy
 def COMPETITION(start, length):
     """Standard competition ranking ("1224" ranking)"""
     for x in xrange(length):
@@ -35,6 +41,7 @@ def COMPETITION(start, length):
     yield start + length
 
 
+@strategy
 def MODIFIED_COMPETITION(start, length):
     """Modified competition ranking ("1334" ranking)"""
     for x in xrange(length):
@@ -42,6 +49,7 @@ def MODIFIED_COMPETITION(start, length):
     yield start + length
 
 
+@strategy
 def DENSE(start, length):
     """Dense ranking ("1223" ranking)"""
     for x in xrange(length):
@@ -49,41 +57,19 @@ def DENSE(start, length):
     yield start + 1
 
 
+@strategy
 def ORDINAL(start, length):
     """Ordinal ranking ("1234" ranking)"""
     return xrange(start, start + length + 1)
 
 
+@strategy
 def FRACTIONAL(start, length):
     """Fractional ranking ("1 2.5 2.5 4" ranking)"""
     avg = (2 * start + length - 1) / float(length)
     for x in xrange(length):
         yield avg
     yield start + length
-
-
-def score_comparer(key=None, reverse=False, no_score=None):
-    """A helper function to generate a cmp function which is aware of score
-    sorting rule.
-
-        >>> my_cmp = score_comparer(no_score=-1) # -1 means "no score"
-        >>> sorted([-3, -2, -1, 0, 1, 2], my_cmp)
-        [2, 1, 0, -2, -3, -1]
-
-    .. versionadded:: 0.2.3
-    """
-    def compare(left, right):
-        left_score = left if key is None else key(left)
-        if left_score == no_score:
-            return 1
-        right_score = right if key is None else key(right)
-        if right_score == no_score:
-            return -1
-        compared = cmp(left_score, right_score)
-        if not reverse:
-            compared = -compared
-        return compared
-    return compare
 
 
 class Ranking(object):
@@ -99,22 +85,24 @@ class Ranking(object):
     :param strategy: a strategy for assigning rankings. Defaults to
                      :func:`COMPETITION`.
     :param start: a first rank. Defaults to 0.
-    :param cmp: a comparation function. Defaults to :func:`cmp`.
-    :param key: a function to get score from a value
-    :param reverse: `sequence` is in ascending order if `True`, descending
-                    otherwise. Defaults to `False`.
-    :param no_score: a value for representing "no score". Defaults to `None`.
+    :param key: (keyword-only) a function to get score from a value
+    :param reverse: (keyword-only) `sequence` is in ascending order if `True`,
+                    descending otherwise. Defaults to `False`.
+    :param no_score: (keyword-only) a value for representing "no score".
+                     Defaults to `None`.
     """
 
-    def __init__(self, sequence, strategy=COMPETITION, start=0, cmp=cmp,
-                 key=None, reverse=False, no_score=None):
+    def __init__(self, sequence, strategy=COMPETITION, start=0, **kwargs):
         self.sequence = sequence
         self.strategy = strategy
         self.start = start
-        self.cmp = cmp
-        self.key = key
-        self.reverse = reverse
-        self.no_score = no_score
+        self.key = kwargs.pop('key', None)
+        self.reverse = kwargs.pop('reverse', False)
+        self.no_score = kwargs.pop('no_score', None)
+        if kwargs:
+            s = 's' if len(kwargs) == 2 else ''
+            params = ', '.join(repr(key) for key in kwargs.iterkeys())
+            raise TypeError('Unexpected keyword argument%s: %s' % (s, params))
 
     def __iter__(self):
         rank, drawn, tie_started, final = self.start, [], None, object()
@@ -132,7 +120,8 @@ class Ranking(object):
             elif right_score == self.no_score or value is final:
                 compared = 1
             else:
-                compared = self.cmp(left_score, right_score)
+                compared = (0 if left_score == right_score else
+                            -1 if left_score < right_score else 1)
                 if self.reverse:
                     compared = -compared
             if compared < 0: # left is less than right
