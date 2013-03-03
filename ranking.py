@@ -66,7 +66,7 @@ def ORDINAL(start, length):
 @strategy
 def FRACTIONAL(start, length):
     """Fractional ranking ("1 2.5 2.5 4" ranking)"""
-    avg = (2 * start + length - 1) / float(length)
+    avg = (2 * start + length - 1) / 2
     for x in xrange(length):
         yield avg
     yield start + length
