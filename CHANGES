@@ -1,3 +1,13 @@
+Version 0.3.1
+-------------
+
+Released on Mar 4th 2013.
+
+Fixes an error of :func:`FRACTIONAL` strategy with multiple tie ranks. Thanks
+to `Yunwon Jeong`_.
+
+.. _Yunwon Jeong: http://youknowone.org/
+
 Version 0.3
 -----------
 

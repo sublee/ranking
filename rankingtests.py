@@ -39,6 +39,11 @@ def test_fractional():
     assert ranks(Ranking([5, 4, 4, 3], FRACTIONAL)) == [0, 1.5, 1.5, 3]
 
 
+def test_fractional_with_multiple_tie_ranks():
+    assert ranks(Ranking([5, 4, 4, 4, 4, 3], FRACTIONAL)) == \
+           [0, 2.5, 2.5, 2.5, 2.5, 5]
+
+
 def test_unsorted():
     with raises(ValueError):
         list(Ranking([5, 4, 4, 5]))
