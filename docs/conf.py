@@ -98,7 +98,7 @@ html_theme = 'ranking'
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {'github_fork': 'sublee/ranking',
-                      'google_analytics': 'UA-28655602-1'}
+                      'google_analytics': 'UA-28655602-4'}
 
 # Add any paths that contain custom themes here, relative to this directory.
 html_theme_path = ['_themes']

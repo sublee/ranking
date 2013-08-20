@@ -77,7 +77,7 @@ class Ranking(object):
     rank and value instead.
 
     >>> scores = [100, 80, 80, 70, None]
-    >>> list(ranking(scores))
+    >>> list(Ranking(scores))
     [(0, 100), (1, 80), (1, 80), (3, 70), (None, None)]
 
     :param sequence: sorted score sequence. `None` in the sequence means that
