@@ -5,13 +5,13 @@
 
     :class:`Ranking` and various strategies for assigning rankings.
 
-    :copyright: (c) 2012-2013 by Heungsub Lee
+    :copyright: (c) 2012-2020 by Heungsub Lee
     :license: BSD, see LICENSE for more details.
 """
 import itertools
 
 
-__version__ = '0.3.1'
+__version__ = '0.3.2'
 __all__ = ['Ranking', 'COMPETITION', 'MODIFIED_COMPETITION', 'DENSE',
            'ORDINAL', 'FRACTIONAL']
 
