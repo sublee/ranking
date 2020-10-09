@@ -107,7 +107,10 @@ class Ranking(object):
     def __iter__(self):
         rank, drawn, tie_started, final = self.start, [], None, object()
         iterator = iter(self.sequence)
-        right = next(iterator)
+        try:
+            right = next(iterator)
+        except StopIteration:
+            return
         right_score = right if self.key is None else self.key(right)
         for value in itertools.chain(iterator, [final]):
             left, right = right, value
