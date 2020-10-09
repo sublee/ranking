@@ -4,7 +4,7 @@ Version 0.3.2
 Released on Oct 9th 2020.
 
 - Stopped supporting Python 2.5, 2.6, 3.2, and 3.3.
-- Supported Python 3.4, 3.5, 3.6, and 3.7.
+- Supported Python 3.4, 3.5, 3.6, 3.7, and 3.8.
 
 Thanks to `Nolan Gilley`_.
 
