@@ -55,6 +55,7 @@ Released on Oct 26th 2012.
 
 - Adds ``reverse`` parameter for :class:`Ranking`.
 - Adds :meth:`Ranking.rank` to find the rank of the value.
+
 Version 0.2.2
 -------------
 
